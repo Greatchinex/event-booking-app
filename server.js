@@ -3,6 +3,8 @@ import graphqlHTTP from "express-graphql";
 import dotenv from "dotenv";
 import { buildSchema } from "graphql";
 
+import models from "./models";
+
 const app = express();
 dotenv.config();
 const port = process.env.PORT;
