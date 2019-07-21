@@ -4,13 +4,12 @@ import dotenv from "dotenv";
 import { buildSchema } from "graphql";
 
 import models from "./models";
+import Event from "./models/event";
 
 const app = express();
 dotenv.config();
 const port = process.env.PORT;
 app.use(express.json()); // Express has its own body parser so no need 2 use d body-parser package
-
-const events = [];
 
 app.use(
     "/graphql",
@@ -46,18 +45,38 @@ app.use(
         `),
         rootValue: {
             events: () => {
-                return events;
+                return Event.find()
+                    .then(events => {
+                        return events.map(event => {
+                            return { ...event._doc };
+                        });
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        throw err;
+                    });
             },
             createEvent: args => {
-                const event = {
-                    _id: Math.random().toString(),
+                // Create an Event
+                const event = new Event({
                     title: args.eventInput.title,
                     description: args.eventInput.description,
                     price: args.eventInput.price,
-                    date: args.eventInput.date
-                };
-                events.push(event);
-                return event;
+                    date: new Date(args.eventInput.date)
+                });
+                // Save Event to Database
+                return event
+                    .save()
+                    .then(result => {
+                        console.log(result._doc);
+                        return { ...result._doc };
+                        // return event
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        throw err;
+                    });
+                // return event;
             }
         },
         graphiql: true
