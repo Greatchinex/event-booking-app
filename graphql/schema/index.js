@@ -25,6 +25,12 @@ export default buildSchema(`
         createdEvents: [Event!]
     }
 
+    type AuthData {
+        userId: ID!
+        token: String!
+        tokenEXpiration: Int!
+    }
+
     input UserInput {
         email: String!
         password: String!
@@ -40,6 +46,7 @@ export default buildSchema(`
     type RootQuery {
         events: [Event!]!
         bookings: [Booking!]!
+        login(email: String!, password: String!): AuthData!
     }
 
     type RootMutation {
@@ -55,4 +62,9 @@ export default buildSchema(`
     }
 `);
 
-// export { buildSchema }
+// type Status {
+//     message: String
+//     value: Boolean
+// }
+
+// createUser(userInput: UserInput): Status;

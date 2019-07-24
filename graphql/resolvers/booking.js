@@ -4,7 +4,10 @@ import { transformBooking } from "./helperFunctions";
 
 // Resolvers Function
 export default {
-    bookings: async () => {
+    bookings: async (args, req) => {
+        if (!req.isAuth) {
+            throw new Error("Authorization Denied");
+        }
         try {
             const bookings = await Booking.find();
             return bookings.map(booking => {
@@ -14,11 +17,14 @@ export default {
             throw err;
         }
     },
-    bookEvent: async args => {
+    bookEvent: async (args, req) => {
+        if (!req.isAuth) {
+            throw new Error("Authorization Denied");
+        }
         try {
             const fetchedEvent = await Event.findOne({ _id: args.eventId });
             const booking = new Booking({
-                user: "5d3488b8c77b162ef64e712a",
+                user: req.userId,
                 event: fetchedEvent
             });
             const result = await booking.save();
@@ -27,7 +33,10 @@ export default {
             throw err;
         }
     },
-    cancelBooking: async args => {
+    cancelBooking: async (args, req) => {
+        if (!req.isAuth) {
+            throw new Error("Authorization Denied");
+        }
         try {
             // Get the id of the booking
             const booking = await Booking.findById(args.bookingId).populate(

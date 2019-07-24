@@ -1,4 +1,5 @@
 import Event from "../../models/event";
+import User from "../../models/users";
 import { tranformEvent } from "./helperFunctions";
 
 // Resolvers Function
@@ -13,14 +14,18 @@ export default {
             throw err;
         }
     },
-    createEvent: async args => {
+    createEvent: async (args, req) => {
+        // Check if User is Authenticated Cause only Authenticated users can create events
+        if (!req.isAuth) {
+            throw new Error("Authorization Denied");
+        }
         // Create an Event
         const event = new Event({
             title: args.eventInput.title,
             description: args.eventInput.description,
             price: args.eventInput.price,
             date: new Date(args.eventInput.date),
-            creator: "5d3488b8c77b162ef64e712a"
+            creator: req.userId
         });
 
         let createdEvent;
@@ -28,7 +33,7 @@ export default {
             // Save Event to Database
             const result = await event.save();
             createdEvent = tranformEvent(result);
-            const creator = await User.findById("5d3488b8c77b162ef64e712a");
+            const creator = await User.findById(req.userId);
             // console.log(result._doc);
             // return event
             if (!creator) {

@@ -5,11 +5,13 @@ import dotenv from "dotenv";
 import models from "./models";
 import graphQlSchema from "./graphql/schema/index";
 import graphQlResolvers from "./graphql/resolvers/index";
+import isAuth from "./middlewares/auth";
 
 const app = express();
 dotenv.config();
 const port = process.env.PORT;
 app.use(express.json()); // Express has its own body parser so no need 2 use d body-parser package
+app.use(isAuth);
 
 app.use(
     "/graphql",
